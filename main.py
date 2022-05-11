@@ -2,7 +2,7 @@ import os
 import json
 import requests
 
-# AWS SCIM Tokens
+# AWS SCIM Token
 auth_token = os.environ.get('SCIMTOKEN')
 url = os.environ.get('URL')
 headers = {'Authorization': 'Bearer {}'.format(auth_token)}
