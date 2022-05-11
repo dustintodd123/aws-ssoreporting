@@ -4,6 +4,7 @@ import requests
 
 # AWS SCIM Token
 auth_token = os.environ.get('SCIMTOKEN')
+# AWS SCIM url - acct specific
 url = os.environ.get('URL')
 headers = {'Authorization': 'Bearer {}'.format(auth_token)}
 
