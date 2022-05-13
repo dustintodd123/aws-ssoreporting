@@ -6,7 +6,7 @@ To run this you need:
 2. A SCIM URL stored in env variable URL. Found in the AWS SSO console. 
 3. A SCIM auth token stored in env variable SCIMTOKEN. Found in the AWS SSO console. 
 
-aws-ssoreporting.py --infile <emails_file> --outfile <report>
+aws-ssoreporting.py --infile <emails_file> --outfile <report_file>
 
  Output file is one row for every group a user is a member of
  email,firstname,lastname,groupname
