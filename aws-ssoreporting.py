@@ -38,7 +38,7 @@ today = date.today()
 print("Today's date:", today)
 # Setup requests header
 headers = {'Authorization': 'Bearer {}'.format(auth_token)}
-print(headers)
+# print(headers)
 
 # Setup report writer
 rpt_file = open(outfile, "w")
