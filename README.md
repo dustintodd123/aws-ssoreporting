@@ -1,14 +1,13 @@
 # aws-ssoreporting
-Thank you very little AWS API team responsible SSO. 
-I need a down and dirty script to report AWS SSO users and groups. Why AWS makes this so hard is just beyond reason. 
+Thank you very little AWS API team responsible for SSO. 
+I needed a down and dirty script to report AWS SSO users and groups. Why AWS makes this so hard is just beyond reason. 
 To run this you need:
-1. A file with every email address in your directory. The CSV needs a header row. Put the email address column name --colname paramter.
-2. A SCIM URL stored in env variable URL. Found in the AWS SSO console. 
-3. A SCIM auth token stored in env variable SCIMTOKEN. Found in the AWS SSO console. 
+1. A file with every email address in your directory. The CSV needs a header row. Put the email address column name in --colname paramter.
+2. AWS SSO SCIM URL stored in env variable URL. Found in the AWS SSO console. 
+3. AWS SSO SCIM auth token stored in env variable SCIMTOKEN. Found in the AWS SSO console. 
 
 python aws-ssoreporting.py --infile=<emails_file> --outfile=<report_file> --colname=<email_addr_column_name>
 
  Output rpt file is one row for every group a user is a member of
  email,firstname,lastname,groupname
  
- Note: My python sucks.
