@@ -27,7 +27,7 @@ for opt, arg in opts:
         print('Report file' + outfile)
     elif opt in ("-colname", "--colname"):
         emailHeader = arg
-        print('Email file column header' + emailHeader)
+        print('Email column name ' + emailHeader)
 
 # AWS SCIM Token
 auth_token = os.environ.get('SCIMTOKEN')
