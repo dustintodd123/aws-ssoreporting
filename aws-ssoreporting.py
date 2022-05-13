@@ -5,7 +5,7 @@ import getopt
 import csv
 import sys
 import requests
-
+from datetime import date
 
 infile, outfile = None, None
 argumentList = sys.argv[1:]
@@ -33,6 +33,9 @@ for opt, arg in opts:
 auth_token = os.environ.get('SCIMTOKEN')
 # AWS SCIM url - acct specific
 url = os.environ.get('URL')
+# Log date
+today = date.today()
+print("Today's date:", today)
 # Setup requests header
 headers = {'Authorization': 'Bearer {}'.format(auth_token)}
 print(headers)
