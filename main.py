@@ -1,22 +1,91 @@
-import os
 import json
+import os
+import time
+import getopt
+import csv
+import sys
 import requests
+
+
+infile, outfile = None, None
+argumentList = sys.argv[1:]
+try:
+    opts, args = getopt.getopt(argumentList, "infile:outfile", ["infile=", "outfile="])
+except getopt.GetoptError:
+    print('aws-ssoreporting.py --infile <emails_file> --outfile <report>')
+    sys.exit(2)
+
+for opt, arg in opts:
+    if opt in ("-h", "--help"):
+        print('aws-ssoreporting.py --infile <emails_file> --outfile <report>')
+        sys.exit()
+    elif opt in ("-infile", "--infile"):
+        infile = arg
+        print(infile)
+    elif opt in ("-outfile", "--outfile"):
+        outfile = arg
+        print(outfile)
 
 # AWS SCIM Token
 auth_token = os.environ.get('SCIMTOKEN')
 # AWS SCIM url - acct specific
 url = os.environ.get('URL')
+# Setup requests header
 headers = {'Authorization': 'Bearer {}'.format(auth_token)}
+print(headers)
 
-response = requests.get(url + '/Users', headers=headers)
+# Setup report writer
+rpt_file = open(outfile, "w")
+rpt_file.truncate()
+writer = csv.writer(rpt_file,delimiter=',')
 
-print(response.status_code)
-print(response.url)
-print(response.headers)
-content = json.loads(response.text)
-for users in content['Resources']:
-    print(users['id'] + " " + users['userName'])
+# Setup CSV email addr file
+filename = open(infile, 'r')
+emailsCsv = csv.DictReader(filename)
+emails = {}
+# Default Google Worplace download file users the column header "Email Address [Required]"
+emailHeader = 'Email Address [Required]'
+# Read each email address and query to get ID from AWS
+for col in emailsCsv:
 
-print("Status Code", response.status_code)
-print(content['totalResults'])
-print(content['itemsPerPage'])
+    response = requests.get(url + '/Users', headers=headers, params={'filter': 'userName eq "' +
+                                                                                   col[emailHeader] + '"'})
+    if response.status_code == 200:
+        scimUser = json.loads(response.text)
+        if scimUser['totalResults'] > 0:
+            emails[col[emailHeader]] = scimUser['Resources'][0]['id']
+        else:
+            print('Email not in SSO store: ' + col['Email Address [Required]'])
+    else:
+        print('SCIM user request failed: ' + response.headers['x-amzn-ErrorType'])
+    # Don't get rated limited
+    time.sleep(.1)
+
+print('email file load complete - Found:', len(emails))
+# print(emails)
+
+# Get all SSO groups
+response = requests.get(url + '/Groups', headers=headers)
+if 200 != response.status_code:
+    print('SCIM List groups error: ' + response.headers['x-amzn-ErrorType'])
+    exit(2)
+else:
+    groups = json.loads(response.text)
+
+# Iterate through each group
+for groups in groups['Resources']:
+    print('Groupname: ' + groups['displayName'])
+    # for each email address and group perform group check
+    # Why AWS thinks this is an ok solution is beyond explanation
+    for key, value in emails.items():
+        response = requests.get(url + '/Groups', headers=headers, params={
+            'filter': 'id eq "' + groups['id'] + '" and members eq "' + value + '"'})
+        if response.status_code == 200:
+            groupData = json.loads(response.text)
+            if groupData['totalResults'] > 0:
+                writer.writerow([key, groupData['Resources'][0]['displayName']])
+                print(groupData['Resources'][0]['displayName'] + ' ' + key)
+        else:
+            print('SCIM request failed: ' + response.headers['x-amzn-ErrorType'])
+
+rpt_file.close()
