@@ -11,4 +11,4 @@ python aws-ssoreporting.py --infile=<emails_file> --outfile=<report_file> --coln
  Output rpt file is one row for every group a user is a member of
  email,firstname,lastname,groupname
  
- Note: I wish was better at python and I had some time to make this better. 
+ Note: My python sucks.
