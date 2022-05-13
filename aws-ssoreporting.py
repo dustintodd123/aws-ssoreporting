@@ -10,21 +10,24 @@ import requests
 infile, outfile = None, None
 argumentList = sys.argv[1:]
 try:
-    opts, args = getopt.getopt(argumentList, "infile:outfile", ["infile=", "outfile="])
+    opts, args = getopt.getopt(argumentList, "infile:outfile:colname", ["infile=", "outfile=","colname="])
 except getopt.GetoptError:
-    print('aws-ssoreporting.py --infile <emails_file> --outfile <report>')
+    print('aws-ssoreporting.py --infile <emails_file> --outfile <report_file> --colname <csv_column_header_name')
     sys.exit(2)
 
 for opt, arg in opts:
     if opt in ("-h", "--help"):
-        print('aws-ssoreporting.py --infile <emails_file> --outfile <report>')
+        print('aws-ssoreporting.py --infile <emails_file> --outfile <report> --colname <csv_column_header_name')
         sys.exit()
     elif opt in ("-infile", "--infile"):
         infile = arg
-        print(infile)
+        print('Email file' + infile)
     elif opt in ("-outfile", "--outfile"):
         outfile = arg
-        print(outfile)
+        print('Report file' + outfile)
+    elif opt in ("-colname", "--colname"):
+        emailHeader = arg
+        print('Email file column header' + emailHeader)
 
 # AWS SCIM Token
 auth_token = os.environ.get('SCIMTOKEN')
@@ -43,8 +46,6 @@ writer = csv.writer(rpt_file,delimiter=',')
 filename = open(infile, 'r')
 emailsCsv = csv.DictReader(filename)
 emails = {}
-# Default Google Worplace download file users the column header "Email Address [Required]"
-emailHeader = 'Email Address [Required]'
 # Read each email address and query to get ID from AWS
 for col in emailsCsv:
 
@@ -52,12 +53,10 @@ for col in emailsCsv:
                                                                                    col[emailHeader] + '"'})
     if response.status_code == 200:
         scimUser = json.loads(response.text)
-        print(scimUser)
         if scimUser['totalResults'] > 0:
             emails[col[emailHeader]] = []
             emails[col[emailHeader]].append({'id': scimUser['Resources'][0]['id'],
                                              'name': scimUser['Resources'][0]['name']})
-            print(emails[col[emailHeader]])
         else:
             print('Email not in SSO store: ' + col['Email Address [Required]'])
     else:
