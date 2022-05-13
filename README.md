@@ -10,5 +10,6 @@ To run this you need:
 python aws-ssoreporting.py --infile=<emails_file> --outfile=<report_file> --colname=<email_addr_column_name>
 
  Output rpt file is one row for every group a user is a member of like so:
+ 
  email,firstname,lastname,groupname
  
