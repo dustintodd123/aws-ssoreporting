@@ -52,8 +52,12 @@ for col in emailsCsv:
                                                                                    col[emailHeader] + '"'})
     if response.status_code == 200:
         scimUser = json.loads(response.text)
+        print(scimUser)
         if scimUser['totalResults'] > 0:
-            emails[col[emailHeader]] = scimUser['Resources'][0]['id']
+            emails[col[emailHeader]] = []
+            emails[col[emailHeader]].append({'id': scimUser['Resources'][0]['id'],
+                                             'name': scimUser['Resources'][0]['name']})
+            print(emails[col[emailHeader]])
         else:
             print('Email not in SSO store: ' + col['Email Address [Required]'])
     else:
@@ -79,11 +83,11 @@ for groups in groups['Resources']:
     # Why AWS thinks this is an ok solution is beyond explanation
     for key, value in emails.items():
         response = requests.get(url + '/Groups', headers=headers, params={
-            'filter': 'id eq "' + groups['id'] + '" and members eq "' + value + '"'})
+            'filter': 'id eq "' + groups['id'] + '" and members eq "' + value[0]['id'] + '"'})
         if response.status_code == 200:
             groupData = json.loads(response.text)
             if groupData['totalResults'] > 0:
-                writer.writerow([key, groupData['Resources'][0]['displayName']])
+                writer.writerow([key, value[0]['name']['givenName'], value[0]['name']['familyName'], groupData['Resources'][0]['displayName']])
                 print(groupData['Resources'][0]['displayName'] + ' ' + key)
         else:
             print('SCIM request failed: ' + response.headers['x-amzn-ErrorType'])
