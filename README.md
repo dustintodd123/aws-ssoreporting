@@ -1,5 +1,6 @@
 # aws-ssoreporting
 Thank you very little AWS API team responsible for SSO. 
+Background is here: https://github.com/aws/aws-sdk/issues/109
 I needed a down and dirty script to report AWS SSO users and groups. Why AWS makes this so hard is just beyond reason. 
 To run this you need:
 1. A file with every email address in your directory. The CSV needs a header row. Put the email address column name in --colname paramter.
