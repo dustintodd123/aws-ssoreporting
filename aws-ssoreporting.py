@@ -61,7 +61,7 @@ for col in emailsCsv:
             emails[col[emailHeader]].append({'id': scimUser['Resources'][0]['id'],
                                              'name': scimUser['Resources'][0]['name']})
         else:
-            print('Email not in SSO store: ' + col['Email Address [Required]'])
+            print('Email not in SSO store: ' + col[emailHeader])
     else:
         print('SCIM user request failed: ' + response.headers['x-amzn-ErrorType'])
     # Don't get rated limited
